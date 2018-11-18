@@ -152,7 +152,7 @@ ANN *File::readANN() {
 //Private:
 void File::check() {
     if(m_file.rdstate() & (fstream::failbit | fstream::badbit))
-        throw Error(1, "A problem has occured while reading " + m_path + '!');
+        throw Error(0, "A problem has occured while reading/writing " + m_path + '!');
 }
 
 int File::countLines() {

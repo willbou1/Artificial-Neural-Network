@@ -4,15 +4,15 @@ void progressBar(unsigned int *progress, unsigned int range) {
 	//Code for the thread that creates and updates a progress bar
 	unsigned int pourcentage = 0;
 	do {
-		pourcentage = 100 * (*progress) / range;
-		cout << string(105, ' ') << '\r';
-		for (int i = 0; i < pourcentage; i++)
+		pourcentage = 100 * (*progress) / range + 1;
+		cout << '\r' << string(105, ' ') << '\r';
+		for (int i = 0; i < pourcentage / 2; i++)
 			cout << '=';
-		cout << setw(2) << setfill('0') << "  ";
-		cout << pourcentage << '%';
+		cout << "  ";
+		cout << setw(2) << setfill('0') << pourcentage << '%';
 		Sleep(500);
-	} while (pourcentage < 99);
-	cout << string(105, ' ') << "\rDone!";
+	} while (pourcentage < 100);
+	cout << '\r' << string(105, ' ') << "\rDone!" << endl;
 }
 
 float unify(float input, int range) {

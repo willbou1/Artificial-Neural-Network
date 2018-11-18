@@ -7,12 +7,12 @@ ANN::Neuron::Neuron(unsigned int prevLayerSize) : activation(0) {
     if(prevLayerSize) {
         for(int i = 0; i < prevLayerSize; i++)
             weights.push_back(randToOne());
-        bias = randToOne() * 2 - 1;
+        bias = randToOne();
     }
 }
 
 //Public:
-ANN::ANN(unsigned int nbHLayers, unsigned int nbInputNeurons, unsigned int nbHiddenNeurons, unsigned int nbOutputNeurons, float learningRate) : nbHLayers(nbHLayers), learningRate(learningRate) {
+ANN::ANN(unsigned int nbHLayers, unsigned int nbInputNeurons, unsigned int nbHiddenNeurons, unsigned int nbOutputNeurons, float learningRate) : m_nbHLayers(nbHLayers), m_learningRate(learningRate) {
 	initLayerSizes(nbInputNeurons, nbHiddenNeurons, nbOutputNeurons);
     initNeurons();
 }
@@ -22,7 +22,7 @@ ANN::ANN(const TrainingSet *trainingSet, unsigned int nbHLayers, unsigned  nbHid
         nbHiddenNeurons = (int)(1.5 * (float)trainingSet->maxInputSize);
 	initLayerSizes(trainingSet->maxInputSize, nbHiddenNeurons, 1);
 	initNeurons();
-    train(trainingSet, 1000);
+    train(trainingSet, 200);
 }
 
 ANN::ANN(const vector<int> &layerSizes, float learningRate) : m_layerSizes(layerSizes), m_learningRate(learningRate) {
@@ -194,15 +194,29 @@ string ANN::mapOutput(float output) {
 }
 
 float ANN::activate(float input, int layer) {
-    if(input <= 0)
-        return 0;
     return input / (m_layerSizes[layer - 1] + 1);
 }
 
 void ANN::updateWeights(const vector<float> &gradient, Neuron *neuron) {
-	for (int i = 0; i < neuron->weights.size(); i++)
-		neuron->weights[i] += -gradient[i] * m_learningRate * 0.01;
-	neuron->bias += -gradient.back() * m_learningRate * 0.0001;
+	float updatedWeight, updatedBias;
+	for (int i = 0; i < neuron->weights.size(); i++) {
+		updatedWeight = neuron->weights[i] + -gradient[i] * m_learningRate;
+		//Making sure that the updated weight sits between 0 and 1
+		if (updatedWeight < 0)
+			neuron->weights[i] = 0;
+		else if(updatedWeight > 1)
+			neuron->weights[i] = 1;
+		else
+			neuron->weights[i] = updatedWeight;
+	}
+	updatedBias = neuron->bias + -gradient.back() * m_learningRate * 0.1;
+	//Making sure that the updated bias sits between 0 and 1
+	if (updatedBias < 0)
+		neuron->bias = 0;
+	else if (updatedBias > 1)
+		neuron->bias = 1;
+	else
+		neuron->bias = updatedBias;
 }
 
 float ANN::findCost(const vector<float> &outputs) {

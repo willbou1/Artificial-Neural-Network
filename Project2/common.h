@@ -28,6 +28,10 @@ struct TrainingSet {
     unsigned int maxInputSize;
 };
 
+/*Error codes:
+0: Error while using files
+1: Bad command line arguments
+*/
 struct Error {
     Error(int code, string msg) : code(code), msg(msg) {}
     int code;
