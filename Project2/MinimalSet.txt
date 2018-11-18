@@ -1,0 +1,31 @@
+2
+English {
+any
+are
+around
+as
+at
+does
+don't
+down
+each
+end
+even
+every
+}
+Français {
+angle
+armoire
+banc
+bureau
+cabinet
+carreau
+chaise
+classe
+clé
+coin
+couloir
+dossier
+eau
+école
+}
