@@ -125,7 +125,7 @@ void ANN::backpropagate(const vector<float> &outputs, unsigned int layer) {
 	int nbOutputNeurons = m_layerSizes[m_nbHLayers + 1];
 	for (int i = 0; i < nbOutputNeurons; i++) {
 		//dBase (dC/dz) = dz(cost(act)) = da(cost) * dz(act)
-		dBase = (outputs[i] - m_neurons[m_nbHLayers + 1][i]->activation);
+		dBase = (m_neurons[m_nbHLayers + 1][i]->activation - outputs[i]);
 		dBase *= (1 / (float)(m_layerSizes[m_nbHLayers] + 1));
 		for (int j = 0; j < m_layerSizes[m_nbHLayers]; j++) {
 			//derivative (dC/dw) = dBase * dw(wSums)
@@ -141,7 +141,7 @@ void ANN::backpropagate(const vector<float> &outputs, unsigned int layer) {
 			updateWeights(gradients[m_nbHLayers + 1][i], m_neurons[m_nbHLayers + 1][i]);
 		//Repropagating
 		propagate(m_nbHLayers + 1);
-		//Rebackpropagating
+		//Backpropagate layers before layer
 		backpropagate(outputs, layer - 1);
 		return;
 	}
@@ -167,7 +167,7 @@ void ANN::backpropagate(const vector<float> &outputs, unsigned int layer) {
 				updateWeights(gradients[i][j], m_neurons[i][j]);
 			//Repropagate
 			propagate(i);
-			//Rebackpropagating
+			//Backpropagate layers before layer
 			backpropagate(outputs, layer - 1);
 			return;
 		}
@@ -209,7 +209,7 @@ void ANN::updateWeights(const vector<float> &gradient, Neuron *neuron) {
 		else
 			neuron->weights[i] = updatedWeight;
 	}
-	updatedBias = neuron->bias + -gradient.back() * m_learningRate * 0.1;
+	updatedBias = neuron->bias + (-gradient.back() * m_learningRate);
 	//Making sure that the updated bias sits between 0 and 1
 	if (updatedBias < 0)
 		neuron->bias = 0;
@@ -223,6 +223,6 @@ float ANN::findCost(const vector<float> &outputs) {
 	float ret = 0;
 	vector<Neuron*> &outputLayer = m_neurons[m_nbHLayers + 1];
 	for (int i = 0; i < outputLayer.size(); i++)
-		ret += (0.5 * (outputs[i] - outputLayer[i]->activation) * (outputs[i] - outputLayer[i]->activation));
+		ret += (0.5 * (outputLayer[i]->activation - outputs[i]) * (outputLayer[i]->activation - outputs[i]));
 	return ret;
 }

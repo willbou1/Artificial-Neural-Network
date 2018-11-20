@@ -8,7 +8,7 @@ void printUsage(char *progName) {
     cout << "Invalid parameters!" << endl;
     cout << "Usage:" << endl;
     cout << progName << " train file [nbHiddenLayers] [nbNeuronsPerHiddenLayer]" << endl;
-    cout << progName << " test file input [input]..." << endl;
+    cout << progName << " test file [input] [input]..." << endl;
 	system("pause");
     exit(0);
 }
@@ -51,11 +51,23 @@ void doTrain(int argc, char *argv[]) {
 }
 
 void doTest(int argc, char *argv[]) {
-	if (argc < 4)
-		throw Error(1, "The action test takes two argument minimum");
+	if (argc < 3)
+		throw Error(1, "The action test takes at least one argument");
 	File *annFile = new File(string(argv[2]));
 	ANN *neuralNet = annFile->readANN();
-	//Testing all the inputs
+	//If no input is supplied
+	if (argc == 3) {
+		cout << "Type q or quit to quit" << endl;
+		string buffer;
+		while(1) {
+			cout << "input> ";
+			cin >> buffer;
+			if (buffer == "q" | buffer == "quit")
+				break;
+			cout << neuralNet->probe(stringToInput(buffer)) << endl;
+		}
+	}
+	//Testing all the inputs supplied
 	for(int i = 0; i < argc - 3; i++)
 		cout << neuralNet->probe(stringToInput(string(argv[3 + i]))) << endl;
 	annFile->close();

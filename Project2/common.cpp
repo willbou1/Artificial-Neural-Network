@@ -29,7 +29,7 @@ float randToOne() {
 	static unsigned int seed = 0;
     srand(seed);
 	seed += 10;
-    return (float)(rand() % 10000) / 10000 + 0.0001;
+    return (float)(rand() % 100) / 100 + 0.01;
 }
 
 string stripExtension(const char *path) {
@@ -43,6 +43,6 @@ vector<float> stringToInput(string &input) {
 	//Converts a string to a vector of floats ranging from 0 to 1
 	vector<float> ret;
 	for (int i = 0; i < input.length(); i++)
-		ret.push_back(input[i]);
+		ret.push_back(unify(input[i], 255));
 	return ret;
 }

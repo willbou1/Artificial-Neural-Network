@@ -47,7 +47,7 @@ TrainingSet *File::readTrainingSet() {
         progress++;
         while(1) {
             //Reading sample
-			m_file.getline(buffer, 256);
+			m_file.getline(buffer, 255);
             if(buffer[0] == '}')
                 break;
             check();
@@ -57,7 +57,7 @@ TrainingSet *File::readTrainingSet() {
             if(maxLength < len)
                 maxLength = len;
             for(int j = 0; j < len; j++)
-                curr.input.push_back(unify(buffer[j], 256));
+                curr.input.push_back(unify(buffer[j], 255));
             ret->samples.push_back(curr);
             //Progress bar
             progress++;
