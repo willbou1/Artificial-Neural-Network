@@ -11,8 +11,16 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <string.h>
-#include <Windows.h>
 #include <time.h>
+
+//Sleep function isn't the same for windows and linux
+#ifdef _WIN32
+#include <Windows.h>
+#elif defined(__APPLE__)
+#include <>unistd.h>
+#elif defined(__linux__)
+#include <>unistd.h>
+#endif
 
 using namespace std;
 
@@ -41,6 +49,7 @@ struct Error {
 void progressBar(unsigned int *progress, unsigned int range);
 float unify(float input, int range);
 void clear();
+void sleep(unsigned int time);
 float randToOne();
 string stripExtension(const char *path);
 vector<float> stringToInput(string &input);

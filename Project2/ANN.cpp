@@ -92,7 +92,7 @@ void ANN::train(const TrainingSet *trainingSet, unsigned int nbIterations) {
 		for (int j = 0; j < nbSamples; j++) {
 			ANN optimization = *this;
 			//Update weights until the cost doesn't change anymore
-			float cost = optimization.findCost(trainingSet->samples[j].output);
+			float cost = 1;
 			while (1) {
 				optimization.propagate(trainingSet->samples[j].input);
 				optimization.backpropagate(trainingSet->samples[j].output, m_nbHLayers + 1);

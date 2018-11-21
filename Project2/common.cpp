@@ -10,7 +10,7 @@ void progressBar(unsigned int *progress, unsigned int range) {
 			cout << '=';
 		cout << "  ";
 		cout << setw(2) << setfill('0') << pourcentage << '%';
-		Sleep(500);
+		sleep();
 	} while (pourcentage < 100);
 	cout << '\r' << string(105, ' ') << "\rDone!" << endl;
 }
@@ -21,7 +21,23 @@ float unify(float input, int range) {
 }
 
 void clear() {
+    #ifdef _WIN32
     system("cls");
+    #elif defined(__APPLE__)
+    system("clear");
+    #elif defined(__linux__)
+    system("clear");
+    #endif
+}
+
+void sleep(unsigned int time) {
+    #ifdef _WIN32
+    Sleep(time);
+    #elif defined(__APPLE__)
+    usleep(time);
+    #elif defined(__linux__)
+    usleep(time);
+    #endif
 }
 
 float randToOne() {
