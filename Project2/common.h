@@ -44,5 +44,6 @@ void clear();
 float randToOne();
 string stripExtension(const char *path);
 vector<float> stringToInput(string &input);
+string inputToString(const vector<float> &input);
 
 #endif

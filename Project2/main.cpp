@@ -21,7 +21,7 @@ void train(char *trainingFilePath, unsigned int nbHLayers, unsigned int nbHNeuro
 	File *trainingFile = new File(string(trainingFilePath));
 	TrainingSet *trainingSet = trainingFile->readTrainingSet();
 	trainingFile->close();
-	ANN *neuralNet = new ANN(trainingSet, nbHLayers, nbHNeurons, 1);
+	ANN *neuralNet = new ANN(trainingSet, nbHLayers, nbHNeurons, 1000);
 	File *annFile = new File(stripExtension(trainingFilePath) + ".adf");
 	annFile->saveANN(neuralNet);
 	annFile->close();
@@ -64,12 +64,19 @@ void doTest(int argc, char *argv[]) {
 			cin >> buffer;
 			if (buffer == "q" | buffer == "quit")
 				break;
+			if (buffer.empty())
+				continue;
+			if (buffer.length() > neuralNet->getNbInputNeurons())
+				throw Error(2, "The input exceeds the number of input neurons");
 			cout << neuralNet->probe(stringToInput(buffer)) << endl;
 		}
 	}
 	//Testing all the inputs supplied
-	for(int i = 0; i < argc - 3; i++)
+	for (int i = 0; i < argc - 3; i++) {
+		if (strlen(argv[3 + i]) > neuralNet->getNbInputNeurons())
+			throw Error(2, "The input exceeds the number of input neurons");
 		cout << neuralNet->probe(stringToInput(string(argv[3 + i]))) << endl;
+	}
 	annFile->close();
 	delete annFile;
 	delete neuralNet;

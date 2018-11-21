@@ -22,11 +22,9 @@ void File::close() {
 
 TrainingSet *File::readTrainingSet() {
     cout << "Reading the training set of " << m_path << endl;
-	//Openning the file in read-only mode
-	open();
-    //Starting progress bar thread
+	open(); //Openning the file in read-only mode
     unsigned int progress = 0;
-    thread progressBarThread(&progressBar, &progress, m_nbLines);
+    thread progressBarThread(&progressBar, &progress, m_nbLines); //Starting the progress bar's thread
     TrainingSet *ret = new TrainingSet;
     char *buffer = new char[256];
     m_file.getline(buffer, 256);
@@ -43,11 +41,9 @@ TrainingSet *File::readTrainingSet() {
         ret->outputMap[output] = string(buffer);
 		m_file.getline(buffer, 256);
         check();
-        //Progress bar
-        progress++;
+        progress++; //Progress bar
         while(1) {
-            //Reading sample
-			m_file.getline(buffer, 255);
+			m_file.getline(buffer, 255); //Reading sample
             if(buffer[0] == '}')
                 break;
             check();
@@ -59,8 +55,7 @@ TrainingSet *File::readTrainingSet() {
             for(int j = 0; j < len; j++)
                 curr.input.push_back(unify(buffer[j], 255));
             ret->samples.push_back(curr);
-            //Progress bar
-            progress++;
+            progress++; //Progress bar
         }
     }
     ret->maxInputSize = maxLength;
@@ -72,8 +67,7 @@ TrainingSet *File::readTrainingSet() {
 
 void File::saveANN(ANN *ann) {
 	cout << "Saving neural network in " << m_path << endl;
-	//Openning the file in write-only/trunc mode
-	open(fstream::out | fstream::trunc);
+	open(fstream::out | fstream::trunc); //Openning the file in write-only/trunc mode
 	unsigned int progress = 0;
     int nbLayers = ann->m_layerSizes.size();
 	//Writing header
@@ -94,8 +88,7 @@ void File::saveANN(ANN *ann) {
             for(int k = 0; k < curr->weights.size(); k++)
                 m_file << curr->weights[k] << ' ';
             m_file << endl << curr->bias << endl;
-			//Progress bar
-			progress++;
+			progress++; //Progress bar
         }
     }
 	progressBarThread.join();
@@ -103,8 +96,7 @@ void File::saveANN(ANN *ann) {
 
 ANN *File::readANN() {
 	cout << "Reading neural network in " << m_path << endl;
-	//Openning the file in read-only mode
-	open();
+	open(); //Openning the file in read-only mode
 	unsigned int progress = 0;
     string buffer;
 	int nbLayers, nbPossibleOuputs;
@@ -114,7 +106,7 @@ ANN *File::readANN() {
     nbLayers = atoi(buffer.c_str());
 	m_file >> buffer;
 	learningRate = stof(buffer);
-    vector<int> layerSizes;
+    vector<unsigned int> layerSizes;
     for(int i = 0; i < nbLayers; i++) {
         m_file >> buffer;
         layerSizes.push_back(atoi(buffer.c_str()));
@@ -141,8 +133,7 @@ ANN *File::readANN() {
             }
             m_file >> buffer;
             curr->bias = stof(buffer);
-			//Progress bar
-			progress++;
+			progress++; //Progress bar
         }
     }
 	progressBarThread.join();
@@ -151,6 +142,7 @@ ANN *File::readANN() {
 
 //Private:
 void File::check() {
+	//Checking if any error happened while using the file
     if(m_file.rdstate() & (fstream::failbit | fstream::badbit))
         throw Error(0, "A problem has occured while reading/writing " + m_path + '!');
 }

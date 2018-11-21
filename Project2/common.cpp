@@ -46,3 +46,10 @@ vector<float> stringToInput(string &input) {
 		ret.push_back(unify(input[i], 255));
 	return ret;
 }
+
+string inputToString(const vector<float> &input) {
+	string buffer;
+	for (int i = 0; i < input.size(); i++)
+		buffer += (char)(input[i] * 256);
+	return buffer;
+}
