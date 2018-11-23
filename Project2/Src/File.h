@@ -10,8 +10,10 @@ public:
     void open(fstream::openmode openMode = fstream::in);
     void close();
     TrainingSet *readTrainingSet();
-    void saveANN(ANN *);
+    void saveANN(ANN *ann);
     ANN *readANN();
+	void saveWordClassifier(WordClassifier *wordClassifier);
+	WordClassifier *readWordClassifier();
     
 private:
     void check();

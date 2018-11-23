@@ -1,5 +1,10 @@
 #include "common.h"
 
+//TrainingSet
+void TrainingSet::computeNbSamples() {
+	nbSamples = samples.size();
+}
+
 void progressBar(unsigned int *progress, unsigned int range) {
 	//Code for the thread that creates and updates a progress bar
 	unsigned int pourcentage = 0;
@@ -10,7 +15,7 @@ void progressBar(unsigned int *progress, unsigned int range) {
 			cout << '=';
 		cout << "  ";
 		cout << setw(2) << setfill('0') << pourcentage << '%';
-		sleep();
+		sleep(250);
 	} while (pourcentage < 100);
 	cout << '\r' << string(105, ' ') << "\rDone!" << endl;
 }
@@ -48,14 +53,13 @@ float randToOne() {
     return (float)(rand() % 100) / 100 + 0.01;
 }
 
-string stripExtension(const char *path) {
+string stripExtension(const string &path) {
 	//Removes the extension from a file path
-    string temp = path;
-    int lastindex = temp.find_last_of("."); 
-    return temp.substr(0, lastindex); 
+    int lastindex = path.find_last_of("."); 
+    return path.substr(0, lastindex); 
 }
 
-vector<float> stringToInput(string &input) {
+vector<float> stringToInput(const string &input) {
 	//Converts a string to a vector of floats ranging from 0 to 1
 	vector<float> ret;
 	for (int i = 0; i < input.length(); i++)

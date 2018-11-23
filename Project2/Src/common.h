@@ -17,23 +17,34 @@
 #ifdef _WIN32
 #include <Windows.h>
 #elif defined(__APPLE__)
-#include <>unistd.h>
+#include <unistd.h>
 #elif defined(__linux__)
-#include <>unistd.h>
+#include <unistd.h>
 #endif
 
 using namespace std;
 
 struct TrainingSample {
-    vector<float> input;
+	TrainingSample() : inputSize(0), outputSize(0){}
+	TrainingSample(unsigned int inputSize, unsigned int outputSize) :
+		inputSize(inputSize),
+		outputSize(outputSize) {}
+	vector<float> input;
     vector<float> output;
+	unsigned int inputSize;
+	unsigned int outputSize;
 };
 
 struct TrainingSet {
-    TrainingSet() : maxInputSize(0) {}
+    TrainingSet(map<float, string> outputMap = map<float, string>(), unsigned int maxInputSize = 0) :
+		maxInputSize(maxInputSize),
+		nbSamples(0),
+		outputMap(outputMap) {}
+	void computeNbSamples();
     map<float, string> outputMap;
     vector<TrainingSample> samples;
     unsigned int maxInputSize;
+	unsigned int nbSamples;
 };
 
 /*Error codes:
@@ -41,7 +52,9 @@ struct TrainingSet {
 1: Bad command line arguments
 */
 struct Error {
-    Error(int code, string msg) : code(code), msg(msg) {}
+    Error(int code, string msg) :
+		code(code),
+		msg(msg) {}
     int code;
     string msg;
 };
@@ -51,8 +64,8 @@ float unify(float input, int range);
 void clear();
 void sleep(unsigned int time);
 float randToOne();
-string stripExtension(const char *path);
-vector<float> stringToInput(string &input);
+string stripExtension(const string &path);
+vector<float> stringToInput(const string &input);
 string inputToString(const vector<float> &input);
 
 #endif

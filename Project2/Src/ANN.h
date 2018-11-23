@@ -14,11 +14,11 @@ class ANN {
     
 public:
     ANN(unsigned int nbHLayers, unsigned int nbInputNeurons, unsigned int nbHiddenNeurons, unsigned int nbOutputNeurons, float learningRate = 0.5);
-    ANN(const TrainingSet *trainingSet, unsigned int nbHLayers, unsigned int nbHiddenNeurons, float learningRate = 0.5);
+    ANN(const TrainingSet *trainingSet, unsigned int nbHLayers = 4, unsigned int nbHiddenNeurons = 0, float learningRate = 0.5);
     ANN(const vector<unsigned int> &layerSizes, float learningRate = 0.5);
 	ANN(const ANN &a);
 	~ANN();
-	unsigned int getNbInputNeurons();
+	unsigned int getNbInputNeurons() const;
 	void initLayerSizes(unsigned int nbInputNeurons, unsigned int nbHiddenNeurons, unsigned int nbOutputNeurons);
     void initNeurons();
 	void train(const TrainingSet *trainingSet, unsigned int nbIterations = 4);

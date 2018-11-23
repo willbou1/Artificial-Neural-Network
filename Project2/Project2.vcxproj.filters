@@ -1,53 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Source files">
+      <UniqueIdentifier>{4fa1930c-3346-4387-b3f9-c6d85cb374dd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{2a64c12e-a753-46ef-b4e1-207287c6791b}</UniqueIdentifier>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{6c98043d-59a6-434f-994a-b18f5b69e621}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Txt Files">
-      <UniqueIdentifier>{6c33c82f-9765-4b70-9406-c23eb3516355}</UniqueIdentifier>
+    <Filter Include="Data">
+      <UniqueIdentifier>{f4cc2354-0df7-4bfd-b4a1-f26ed208ae97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{237658d7-6b8a-4e58-879b-1c21e1e7f1f4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ANN.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="common.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="File.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ANN.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="File.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="MinimalSet.txt">
-      <Filter>Txt Files</Filter>
+    <Text Include="TrainingSet.txt" />
+    <Text Include="Doc\ANN file doc.txt">
+      <Filter>Documentation</Filter>
     </Text>
-    <Text Include="TrainingSet.txt">
-      <Filter>Txt Files</Filter>
+    <Text Include="Doc\WordClassifier file doc.txt">
+      <Filter>Documentation</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TrainingSet.adf">
-      <Filter>Txt Files</Filter>
-    </None>
+    <ClCompile Include="Src\ANN.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\common.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\File.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\main.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\WordClassifier.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\ANN.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\common.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\File.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\WordClassifier.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

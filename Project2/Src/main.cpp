@@ -1,5 +1,6 @@
 #include "common.h"
 #include "ANN.h"
+#include "WordClassifier.h"
 #include "File.h"
 
 using namespace std;
@@ -21,13 +22,14 @@ void train(char *trainingFilePath, unsigned int nbHLayers, unsigned int nbHNeuro
 	File *trainingFile = new File(string(trainingFilePath));
 	TrainingSet *trainingSet = trainingFile->readTrainingSet();
 	trainingFile->close();
-	ANN *neuralNet = new ANN(trainingSet, nbHLayers, nbHNeurons, 1000);
-	File *annFile = new File(stripExtension(trainingFilePath) + ".adf");
-	annFile->saveANN(neuralNet);
+	WordClassifier *wordClassifier = new WordClassifier(trainingSet, nbHLayers, nbHNeurons, 1000);
+	File *annFile = new File(stripExtension(string(trainingFilePath)) + ".adf");
+	annFile->saveWordClassifier(wordClassifier);
 	annFile->close();
 	delete trainingFile;
 	delete annFile;
-	delete neuralNet;
+	delete wordClassifier;
+	delete trainingSet;
 }
 
 void doTrain(int argc, char *argv[]) {
@@ -54,7 +56,7 @@ void doTest(int argc, char *argv[]) {
 	if (argc < 3)
 		throw Error(1, "The action test takes at least one argument");
 	File *annFile = new File(string(argv[2]));
-	ANN *neuralNet = annFile->readANN();
+	WordClassifier *wordClassifier = annFile->readWordClassifier();
 	//If no input is supplied
 	if (argc == 3) {
 		cout << "Type q or quit to quit" << endl;
@@ -66,20 +68,20 @@ void doTest(int argc, char *argv[]) {
 				break;
 			if (buffer.empty())
 				continue;
-			if (buffer.length() > neuralNet->getNbInputNeurons())
-				throw Error(2, "The input exceeds the number of input neurons");
-			cout << neuralNet->probe(stringToInput(buffer)) << endl;
+			if (buffer.length() > wordClassifier->getMaxInputLength())
+				printError(Error(2, "The input exceeds the number of input neurons"));
+			cout << wordClassifier->probe(buffer) << endl;
 		}
 	}
 	//Testing all the inputs supplied
 	for (int i = 0; i < argc - 3; i++) {
-		if (strlen(argv[3 + i]) > neuralNet->getNbInputNeurons())
-			throw Error(2, "The input exceeds the number of input neurons");
-		cout << neuralNet->probe(stringToInput(string(argv[3 + i]))) << endl;
+		if (strlen(argv[3 + i]) > wordClassifier->getMaxInputLength())
+			printError(Error(2, "The input exceeds the number of input neurons"));
+		cout << wordClassifier->probe(string(argv[3 + i])) << endl;
 	}
 	annFile->close();
 	delete annFile;
-	delete neuralNet;
+	delete wordClassifier;
 }
 
 int main(int argc, char *argv[]) {

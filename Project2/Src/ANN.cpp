@@ -1,8 +1,11 @@
 #include "common.h"
 #include "ANN.h"
+#include "WordClassifier.h"
 #include "File.h"
 
-ANN::Neuron::Neuron(unsigned int prevLayerSize) : activation(0) {
+ANN::Neuron::Neuron(unsigned int prevLayerSize) :
+	activation(0)
+{
     //Initializing everything randomly if this isn’t an input neuron
     if(prevLayerSize) {
         for(int i = 0; i < prevLayerSize; i++)
@@ -11,17 +14,23 @@ ANN::Neuron::Neuron(unsigned int prevLayerSize) : activation(0) {
     }
 }
 
-ANN::Neuron::Neuron(const Neuron &a) : activation(a.activation), bias(a.bias) {
-	weights = vector<float>(a.weights);
+ANN::Neuron::Neuron(const Neuron &a) :
+	activation(a.activation), bias(a.bias)
+{
+	weights = a.weights;
 }
 
 //Public:
-ANN::ANN(unsigned int nbHLayers, unsigned int nbInputNeurons, unsigned int nbHiddenNeurons, unsigned int nbOutputNeurons, float learningRate) : m_nbHLayers(nbHLayers), m_learningRate(learningRate) {
+ANN::ANN(unsigned int nbHLayers, unsigned int nbInputNeurons, unsigned int nbHiddenNeurons, unsigned int nbOutputNeurons, float learningRate) :
+	m_nbHLayers(nbHLayers), m_learningRate(learningRate) 
+{
 	initLayerSizes(nbInputNeurons, nbHiddenNeurons, nbOutputNeurons);
     initNeurons();
 }
 
-ANN::ANN(const TrainingSet *trainingSet, unsigned int nbHLayers, unsigned  nbHiddenNeurons = 0, float learningRate) : m_nbHLayers(nbHLayers), m_learningRate(learningRate) {
+ANN::ANN(const TrainingSet *trainingSet, unsigned int nbHLayers, unsigned  nbHiddenNeurons, float learningRate) :
+	m_nbHLayers(nbHLayers), m_learningRate(learningRate)
+{
     if(!nbHiddenNeurons)
         nbHiddenNeurons = (int)(1.5 * (float)trainingSet->maxInputSize);
 	initLayerSizes(trainingSet->maxInputSize, nbHiddenNeurons, 1);
@@ -29,12 +38,16 @@ ANN::ANN(const TrainingSet *trainingSet, unsigned int nbHLayers, unsigned  nbHid
     train(trainingSet, 1);
 }
 
-ANN::ANN(const vector<unsigned int> &layerSizes, float learningRate) : m_layerSizes(layerSizes), m_learningRate(learningRate) {
+ANN::ANN(const vector<unsigned int> &layerSizes, float learningRate) :
+	m_layerSizes(layerSizes), m_learningRate(learningRate)
+{
 	m_nbHLayers = layerSizes.size() - 2;
 	initNeurons();
 }
 
-ANN::ANN(const ANN &a) : m_nbHLayers(a.m_nbHLayers), m_learningRate(a.m_learningRate) {
+ANN::ANN(const ANN &a) :
+	m_nbHLayers(a.m_nbHLayers), m_learningRate(a.m_learningRate)
+{
 	//Copying neurons
 	m_neurons = vector<vector<Neuron*>>(a.m_nbHLayers + 2);
 	for (int i = 0; i < a.m_nbHLayers + 2; i++) {
@@ -42,8 +55,8 @@ ANN::ANN(const ANN &a) : m_nbHLayers(a.m_nbHLayers), m_learningRate(a.m_learning
 			m_neurons[i].push_back(new Neuron(*(a.m_neurons[i][j])));
 		}
 	}
-	m_layerSizes = vector<unsigned int>(a.m_layerSizes);
-	m_outputMap = map<float, string>(a.m_outputMap);
+	m_layerSizes = a.m_layerSizes;
+	m_outputMap = a.m_outputMap;
 }
 
 ANN::~ANN() {
@@ -53,7 +66,7 @@ ANN::~ANN() {
     }
 }
 
-unsigned int ANN::getNbInputNeurons() {
+unsigned int ANN::getNbInputNeurons() const {
 	if (!m_layerSizes.empty())
 		return m_layerSizes[0];
 	return 0;
@@ -83,32 +96,35 @@ void ANN::initNeurons() {
 }
 
 void ANN::train(const TrainingSet *trainingSet, unsigned int nbIterations) {
+	/* By applying gradient descent we can find the optimal configuration of weights and biases 
+	for each training sample. We can then find the overall weights and biases by averaging those of 
+	all these optimal configs. */
 	m_outputMap = trainingSet->outputMap;
-	unsigned int progress = 0, nbSamples = trainingSet->samples.size();
+	unsigned int progress = 0;
 	vector<ANN> optimizations; //Stores the optimized config of the neural network for each sample
-	cout << "Training the neural network" << endl;
-	thread progressBarThread(&progressBar, &progress, nbSamples * nbIterations);
-    for(int i = 0; i < nbIterations; i++) {
-		for (int j = 0; j < nbSamples; j++) {
-			ANN optimization = *this;
-			//Update weights until the cost doesn't change anymore
-			float cost = 1;
-			while (1) {
-				optimization.propagate(trainingSet->samples[j].input);
-				optimization.backpropagate(trainingSet->samples[j].output, m_nbHLayers + 1);
-				float new_cost = optimization.findCost(trainingSet->samples[j].output);
-				if (new_cost == cost)
-					break;
-				cost = new_cost;
-			}
-			optimizations.push_back(optimization);
-			progress++;
+	cout << "Training the neural network:" << endl;
+	cout << "Computing optimizations... (1/2)" << endl;
+	thread progressBarThread(&progressBar, &progress, trainingSet->nbSamples);
+	for (int j = 0; j < trainingSet->nbSamples; j++) {
+		ANN optimization = *this;
+		//Update weights until the cost doesn't change anymore
+		float cost = 1;
+		while (1) {
+			optimization.propagate(trainingSet->samples[j].input);
+			optimization.backpropagate(trainingSet->samples[j].output, m_nbHLayers + 1);
+			float new_cost = optimization.findCost(trainingSet->samples[j].output);
+			if (new_cost >= cost)
+				break;
+			cost = new_cost;
 		}
-		//Calculate the average of the weights and biases between all the optimizations
-		updateNetwork(optimizations);
-		optimizations.clear();
+		optimizations.push_back(optimization);
+		progress++;
 	}
 	progressBarThread.join();
+	cout << "Updating the neural network... (2/2)" << endl;
+	//Calculate the average of the weights and biases between all the optimizations
+	updateNetwork(optimizations);
+	cout << "Done!" << endl;
 }
 
 string ANN::probe(const vector<float> &inputs) {
@@ -126,8 +142,9 @@ void ANN::propagate(const vector<float> &inputs) {
 	for (int i = 0; i < m_layerSizes[0]; i++) {
 		if (i < inputs.size())
 			m_neurons[0][i]->activation = inputs[i];
-		else
-			m_neurons[0][i]->activation = 0.5;
+		else {
+			m_neurons[0][i]->activation = 1;
+		}
 	}
 	//Propagating the input layer through the other layers
 	for (int i = 1; i < m_nbHLayers + 2; i++) {
