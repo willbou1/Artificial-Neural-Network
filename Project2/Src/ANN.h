@@ -22,7 +22,8 @@ public:
 	void initLayerSizes(unsigned int nbInputNeurons, unsigned int nbHiddenNeurons, unsigned int nbOutputNeurons);
     void initNeurons();
 	void train(const TrainingSet *trainingSet, unsigned int nbIterations = 4);
-    string probe(const vector<float> &input);
+    string probeClassification(const vector<float> &inputs);
+	vector<float> probeOutputs(const vector<float> &inputs);
     
 private:
     string mapOutput(float output);

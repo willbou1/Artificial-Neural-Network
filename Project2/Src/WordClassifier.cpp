@@ -21,18 +21,16 @@ WordClassifier::WordClassifier(const TrainingSet *trainingSet, unsigned int nbHL
 		}
 	}
 	//Deleting training sets
-	for (int i = 0; i < m_maxInputLength; i++) {
+	for (int i = 0; i < m_maxInputLength; i++)
 		if (trainingSets[i])
 			delete trainingSets[i];
-	}
 }
 
 WordClassifier::~WordClassifier() {
 	//Deleting neural networks
-	for (int i = 0; i < m_maxInputLength; i++) {
+	for (int i = 0; i < m_maxInputLength; i++)
 		if (m_neuralNetworks[i])
 			delete m_neuralNetworks[i];
-	}
 }
 
 unsigned int WordClassifier::getMaxInputLength() const {
@@ -41,16 +39,16 @@ unsigned int WordClassifier::getMaxInputLength() const {
 
 unsigned int WordClassifier::getNbNeuralNetworks() const {
 	unsigned int ret = 0;
-	for (int i = 0; i < m_maxInputLength; i++) {
+	for (int i = 0; i < m_maxInputLength; i++)
 		if (m_neuralNetworks[i])
 			ret++;
-	}
 	return ret;
 }
 
 string WordClassifier::probe(const string &input) {
 	//Checking the length of the input and probing the associated neural network
-	return m_neuralNetworks[input.length()]->probe(stringToInput(input));
+	cout << m_neuralNetworks[input.length()]->probeOutputs(stringToInput(input))[0] << endl;
+	return m_neuralNetworks[input.length()]->probeClassification(stringToInput(input));
 }
 
 //Private:

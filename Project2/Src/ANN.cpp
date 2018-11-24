@@ -32,7 +32,7 @@ ANN::ANN(const TrainingSet *trainingSet, unsigned int nbHLayers, unsigned  nbHid
 	m_nbHLayers(nbHLayers), m_learningRate(learningRate)
 {
     if(!nbHiddenNeurons)
-        nbHiddenNeurons = (int)(1.5 * (float)trainingSet->maxInputSize);
+        nbHiddenNeurons = (int)(1.5 * (float)trainingSet->maxInputSize) + 1;
 	initLayerSizes(trainingSet->maxInputSize, nbHiddenNeurons, 1);
 	initNeurons();
     train(trainingSet, 1);
@@ -127,13 +127,23 @@ void ANN::train(const TrainingSet *trainingSet, unsigned int nbIterations) {
 	cout << "Done!" << endl;
 }
 
-string ANN::probe(const vector<float> &inputs) {
-	//Propagating input through the neural network
+string ANN::probeClassification(const vector<float> &inputs) {
+	//Propagating inputs through the neural network
 	//Returning the string of the possible output which is the closest to the real output
 	if (!m_outputMap.size())
 		return string();
 	propagate(inputs);
 	return mapOutput(m_neurons[m_nbHLayers + 1][0]->activation);
+}
+
+vector<float> ANN::probeOutputs(const vector<float> &inputs) {
+	//Propagating inputs through the neural network
+	//Returning a vector with the activations of the output layer
+	vector<float> outputs;
+	propagate(inputs);
+	for (int i = 0; i < m_layerSizes[m_nbHLayers + 1]; i++)
+		outputs.push_back(m_neurons[m_nbHLayers + 1][i]->activation);
+	return outputs;
 }
 
 //Private:
@@ -262,7 +272,7 @@ void ANN::updateWeights(const vector<float> &gradient, Neuron *neuron) {
 	//Making small changes to the weights and the bias that are proportional to dC/dw or dC/db
 	float updatedWeight, updatedBias;
 	for (int i = 0; i < neuron->weights.size(); i++) {
-		updatedWeight = neuron->weights[i] + (-gradient[i] * m_learningRate * 10000);
+		updatedWeight = neuron->weights[i] + (-gradient[i] * m_learningRate * 100);
 		//Making sure that the updated weight sits between 0 and 1
 		if (updatedWeight < 0)
 			neuron->weights[i] = 0;
@@ -271,7 +281,7 @@ void ANN::updateWeights(const vector<float> &gradient, Neuron *neuron) {
 		else
 			neuron->weights[i] = updatedWeight;
 	}
-	updatedBias = neuron->bias + (-gradient.back() * m_learningRate * 1000);
+	updatedBias = neuron->bias + (-gradient.back() * m_learningRate * 10);
 	//Making sure that the updated bias sits between 0 and 1
 	if (updatedBias < 0)
 		neuron->bias = 0;

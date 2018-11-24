@@ -15,12 +15,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="TrainingSet.txt" />
     <Text Include="Doc\ANN file doc.txt">
       <Filter>Documentation</Filter>
     </Text>
     <Text Include="Doc\WordClassifier file doc.txt">
       <Filter>Documentation</Filter>
+    </Text>
+    <Text Include="Data\TrainingSet.txt">
+      <Filter>Data</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>

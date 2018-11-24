@@ -5,13 +5,11 @@
 
 using namespace std;
 
-void printUsage(char *progName) {
+void printUsage(char *progPath) {
     cout << "Invalid parameters!" << endl;
     cout << "Usage:" << endl;
-    cout << progName << " train file [nbHiddenLayers] [nbNeuronsPerHiddenLayer]" << endl;
-    cout << progName << " test file [input] [input]..." << endl;
-	system("pause");
-    exit(0);
+    cout << stripPath(progPath) << " train file [nbHiddenLayers] [nbNeuronsPerHiddenLayer]" << endl;
+    cout << stripPath(progPath) << " test file [input] [input]..." << endl;
 }
 
 void printError(Error e) {
@@ -22,7 +20,7 @@ void train(char *trainingFilePath, unsigned int nbHLayers, unsigned int nbHNeuro
 	File *trainingFile = new File(string(trainingFilePath));
 	TrainingSet *trainingSet = trainingFile->readTrainingSet();
 	trainingFile->close();
-	WordClassifier *wordClassifier = new WordClassifier(trainingSet, nbHLayers, nbHNeurons, 1000);
+	WordClassifier *wordClassifier = new WordClassifier(trainingSet, nbHLayers, nbHNeurons, 1);
 	File *annFile = new File(stripExtension(string(trainingFilePath)) + ".adf");
 	annFile->saveWordClassifier(wordClassifier);
 	annFile->close();
@@ -35,16 +33,16 @@ void train(char *trainingFilePath, unsigned int nbHLayers, unsigned int nbHNeuro
 void doTrain(int argc, char *argv[]) {
 	if(argc < 3)
 		throw Error(1, "The action train takes one argument minimum");
-	if (argc > 4)
+	if (argc > 5)
 		throw Error(1, "The action train only takes two arguments maximum");
 	//Default values of these arguments
 	unsigned int nbHLayers = 4, nbHNeurons = 0;
 	if (argc > 3) {
-		nbHLayers = atoi(argv[2]);
+		nbHLayers = atoi(argv[3]);
 		if (nbHLayers < 0)
 			throw Error(1, "You can't have a negative number of hidden layers");
 		if (argc == 5) {
-			nbHNeurons = atoi(argv[3]);
+			nbHNeurons = atoi(argv[4]);
 			if (nbHNeurons < 0)
 				throw Error(1, "You can't have a negative number of neurons per hidden layer");
 		}
@@ -59,17 +57,20 @@ void doTest(int argc, char *argv[]) {
 	WordClassifier *wordClassifier = annFile->readWordClassifier();
 	//If no input is supplied
 	if (argc == 3) {
-		cout << "Type q or quit to quit" << endl;
+		cout << "Type q or quit to quit " << stripPath(argv[0]) << endl;
 		string buffer;
 		while(1) {
 			cout << "input> ";
-			cin >> buffer;
+			getline(cin, buffer);
+			buffer = sanitize(buffer);
 			if (buffer == "q" | buffer == "quit")
 				break;
 			if (buffer.empty())
 				continue;
-			if (buffer.length() > wordClassifier->getMaxInputLength())
+			if (buffer.length() > wordClassifier->getMaxInputLength()) {
 				printError(Error(2, "The input exceeds the number of input neurons"));
+				continue;
+			}
 			cout << wordClassifier->probe(buffer) << endl;
 		}
 	}
@@ -77,7 +78,7 @@ void doTest(int argc, char *argv[]) {
 	for (int i = 0; i < argc - 3; i++) {
 		if (strlen(argv[3 + i]) > wordClassifier->getMaxInputLength())
 			printError(Error(2, "The input exceeds the number of input neurons"));
-		cout << wordClassifier->probe(string(argv[3 + i])) << endl;
+		cout << wordClassifier->probe(sanitize(string(argv[3 + i]))) << endl;
 	}
 	annFile->close();
 	delete annFile;
@@ -99,8 +100,7 @@ int main(int argc, char *argv[]) {
 	} catch (Error e) {
 		printError(e);
 		if (e.code == 1) {
-			system("pause");
-			return 1;
+			printUsage(argv[0]);
 		}
 	}
 	system("pause");

@@ -65,7 +65,9 @@ void clear();
 void sleep(unsigned int time);
 float randToOne();
 string stripExtension(const string &path);
-vector<float> stringToInput(const string &input);
+string stripPath(const string &path);
+vector<float> stringToInput(const string &str);
 string inputToString(const vector<float> &input);
+string sanitize(const string &str, bool toLower = true);
 
 #endif

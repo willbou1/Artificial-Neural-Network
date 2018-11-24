@@ -24,15 +24,14 @@ void File::close() {
 TrainingSet *File::readTrainingSet() {
     cout << "Reading the training set of " << m_path << endl;
 	open(); //Openning the file in read-only mode
-    unsigned int progress = 0; //Progress bar
+    unsigned int progress = 0;
+    thread progressBarThread(&progressBar, &progress, m_nbLines); //Starting the progress bar's thread
     TrainingSet *ret = new TrainingSet;
 	string buffer;
     getline(m_file, buffer);
     check();
     int nbPossibleOutputs = stoi(buffer), maxLength = 0, len;
     float output;
-	//Starting the progress bar's thread
-	thread progressBarThread(&progressBar, &progress, m_nbLines - 1 - (nbPossibleOutputs * 2));
     for(int i = 0;; i++) {
         //Reading possible outputs
         if(m_file.eof())
